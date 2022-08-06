@@ -1,4 +1,3 @@
-from tabnanny import check
 import tkinter
 import time
 import json
@@ -10,16 +9,15 @@ import win32gui_struct
 import win32gui
 import codecs
 import threading
-from PIL import ImageTk
 
 KBjsonname = './配置文件/课表配置.json'
 CSjsonname = './配置文件/参数配置.json'
 GNjsonname = './配置文件/功能配置.json'
 BJjsonname = './配置文件/班级配置.json'
 with open(CSjsonname, encoding='utf-8') as f:
-    listt = json.load(f)  # 获取json文件
+    CSlist = json.load(f)  # 获取json文件
     f.close()
-font = font1 = (listt['font'], listt['lessonlarge'])
+font = font1 = (CSlist['font'], CSlist['lessonlarge'])
 with open(BJjsonname, encoding='utf-8') as m:
     BJlist = json.load(m)  # 获取json文件
     f.close()
@@ -29,6 +27,22 @@ with open(KBjsonname, encoding='utf-8') as s:
 with open(GNjsonname,encoding='utf-8') as d:
     GNlist = json.load(d)
     d.close()
+class write:
+    def write_GN(key,value):
+        with codecs.open(GNjsonname,'w',encoding='utf-8',) as d:
+            GNlist[key] = value
+            json.dump(GNlist, d, ensure_ascii=False)
+        d.close()
+    def write_CS(key,value):
+        with codecs.open(CSjsonname,'w',encoding='utf-8',) as w:
+            CSlist[key] = value
+            json.dump(CSlist, w, ensure_ascii=False)
+        w.close()
+    def write_KB(key,value):
+        with codecs.open(KBjsonname,'w',encoding='utf-8',) as t:
+            KBlist[key] = value
+            json.dump(KBlist, t, ensure_ascii=False)
+        t.close()
 class SysTrayIcon(object):
     QUIT = 'QUIT'
     SPECIAL_ACTIONS = [QUIT]
@@ -251,42 +265,52 @@ class xiugai_kebiao:
         b1.grid(row=8,column=1)
         roo.mainloop()
     def xiugai():
-        print(1)
-        with codecs.open(KBjsonname,'w','utf-8') as s:
-            KBlist['Monday'] = v1.get()
-            KBlist['Tuesday'] = v2.get()
-            KBlist['Wednesday'] = v3.get()
-            KBlist['Thursday'] = v4.get()
-            KBlist['Friday'] = v5.get()
-            KBlist['Saturday'] = v6.get()
-            KBlist['Sunday'] = v7.get()
-            json.dump(KBlist, s, ensure_ascii=False)
-        s.close()
+            write.write_KB(key='Monday',value=v1.get())
+            write.write_KB(key='Tuesday',value=v2.get())
+            write.write_KB(key='Wednesday',value=v3.get())
+            write.write_KB(key='Thursday',value=v4.get())
+            write.write_KB(key='Friday',value=v5.get())
+            write.write_KB(key='Saturday',value= v6.get())
+            write.write_KB(key='Sunday',value=v7.get())
      
 
 class xiugai_peizhi:
-    global f, params
-    with codecs.open(CSjsonname, 'rb', 'utf-8') as f:
-        params = json.load(f)
-    f.close
-
-    def get_json_data(self):
-        params[1][t.get()] = t1.get()
-        print(params[1][t.get()])
-
-    def write_json_data(self):
-        with codecs.open('./配置文件/参数配置.json', 'w', 'utf-8') as r:
-            json.dump(params, r, ensure_ascii=False)
-        r.close()
-        print('文件修改完成')
-
     def init(i):
-        global t, t1
-        roo1 = tkinter.Toplevel()
-        roo1.title('设置')
-        t = tkinter.StringVar()
-        om = 1
-        roo1.mainloop()
+        global v1,v2,v3,v4,v5,pppppp
+        pppppp = tkinter.Toplevel()
+        pppppp.title('参数设置')
+        v1 = tkinter.StringVar()
+        v2 = tkinter.StringVar()
+        v3 = tkinter.StringVar()
+        v4 = tkinter.StringVar()
+        v5 = tkinter.StringVar()
+
+        t1 = tkinter.Label(pppppp,text='透明度').grid(row=1,column=1)
+        t2 = tkinter.Label(pppppp,text='字体（时间）大小').grid(row=2,column=1)
+        t3 = tkinter.Label(pppppp,text='字体（课程表）大小').grid(row=3,column=1)
+        t4 = tkinter.Label(pppppp,text='字体颜色').grid(row=4,column=1)
+        t5 = tkinter.Label(pppppp,text='字体格式（填名称）').grid(row=5,column=1)
+        E1 = tkinter.Entry(pppppp,textvariable=v1).grid(row=1,column=2)
+        E2 = tkinter.Entry(pppppp,textvariable=v2).grid(row=2,column=2)
+        E3 = tkinter.Entry(pppppp,textvariable=v3).grid(row=3,column=2)
+        E4 = tkinter.Entry(pppppp,textvariable=v4).grid(row=4,column=2)
+        E5 = tkinter.Entry(pppppp,textvariable=v5).grid(row=5,column=2)
+        
+        v1.set(CSlist['alpha'])
+        v2.set(CSlist['timelarge'])
+        v3.set(CSlist['lessonlarge'])
+        v4.set(CSlist['fontcolor'])
+        v5.set(CSlist['font'])
+
+        b1 = tkinter.Button(pppppp,text='修改',command=xiugai_peizhi.check)
+        b1.grid(row=6,column=1)
+        pppppp.mainloop()
+    def check():
+        write.write_CS(key='alpha',value=v1.get())
+        write.write_CS(key='timelarge',value=v2.get())
+        write.write_CS(key='lessonlarge',value=v3.get())
+        write.write_CS(key='fontcolor',value=v4.get())
+        write.write_CS(key='font',value=v5.get())
 
 
 def restart(i):
@@ -323,7 +347,7 @@ class get_birth:
             qwe = tkinter.Label(windo,
                                 text='',
                                 fg='black',
-                                font=(listt['font'], 20))
+                                font=font)
             qwe.pack()
             get_birth.aaa(self)
             try:
@@ -405,12 +429,12 @@ def getlesson():
     week = time.strftime("%A")  # 获取今天是周几
     apm = time.strftime("%p")
     if week == "Sunday":
-        lesson = listt[week]
+        lesson = KBlist[week]
     else:
         if apm == 'PM':
             lesson = KBlist[week][4:]  # 获取今日课表
         else:
-            lesson = listt[week][:4]
+            lesson = KBlist[week][:4]
     lb1.configure(text=lesson)
     root.after(1000, getlesson)
 
@@ -421,55 +445,38 @@ def ppt_close(i):
 
 def jianpan_close(i):
     os.system('taskkill /f /im TextInputHost.exe')
-
-
-def time_class():
-    global root11, lb1, lb
-    root11 = tkinter.Tk()
-    # root.overrideredirect(True)
-    root11.attributes('-alpha', listt[1]["alpha"])
-    root11.attributes('-topmost', 1)
-    root11.title('li')
-    lb = tkinter.Label(root11, text='',
-                       fg=listt[1]['fontcolor'],
-                       font=(listt[1]['font'], listt[1]['timelarge']),
-                       )
-    lb1 = tkinter.Label(root11, text='',
-                        fg=listt[1]['fontcolor'],
-                        font=font1)
-    bt1 = tkinter.Button(root11, text="ppt点不开点这里",
-                         fg=listt[1]['fontcolor'],
-                         font=font1,
-                         command=ppt_close)
-    bt2 = tkinter.Button(root11, text='点名',
-                         fg=listt[1]['fontcolor'],
-                         font=font1,
-                         command=dianming)
-    bt3 = tkinter.Button(root11, text='键盘打不开',
-                         fg=listt[1]['fontcolor'],
-                         font=font1,
-                         command=jianpan_close)
-    lb.pack()
-    lb1.pack()
-    bt1.pack()
-    bt2.pack()
-    bt3.pack()
-    gettime()
-    getlesson()
-    root.mainloop()
 class GN_XZ:
     def init(id):
-        rt = tkinter.Toplevel()
-        p = tkinter.PhotoImage(file="./图片/按钮关.png",height=20,width=40)
-        l1 = tkinter.Label(rt,text='生日消息推送').grid(row=1,column=1)
-        l2 = tkinter.Label(rt,text='开机自启动').grid(row=2,column=1)
-        del_button = tkinter.Button(rt, text='DEL', width=20, height=20)
-        del_icon = ImageTk.PhotoImage(resize(os.getcwd()+'/delete.png', 0))
-        del_button.config(image=del_icon)
-        del_button.bind('<Button-1>', delete_selected_image)
-        del_button.grid(row=0, column=0, sticky=tkinter.W)
-    def check():
-        print(1)
+        global ccc
+        top = tkinter.Toplevel()
+        top.title('功能选择')
+        CheckVar1 = tkinter.IntVar()
+        C1 = tkinter.Checkbutton(top, text = "生日提醒服务", variable = CheckVar1,command=GN_XZ.check1)
+        if GNlist['birthdayTX'] == 'Ture':
+            C1.select()
+            ccc = 'Ture'
+        else:
+            ccc = 'False'
+        C1.pack()
+        top.mainloop()
+    def check1():
+        global ccc
+        if ccc == 'Ture':
+            ccc = 'False'
+            write.write_GN(key='birthdayTX',value=ccc)
+        else:
+            ccc = 'Ture'
+            write.write_GN(key='birthdayTX',value=ccc)
+    def check2():
+        global rrr
+        if rrr == 'Ture':
+            rrr = 'False'
+            write.write_GN(key='KJQD',value=rrr)
+        else:
+            rrr = 'Ture'
+            write.write_GN(key='KJQD',value=rrr)
+
+        
 
 if __name__ == '__main__':
     def tuop():
@@ -486,30 +493,26 @@ if __name__ == '__main__':
 
         def bye(SysTrayIcon):
             os._exit(1)
-
         SysTrayIcon(icons, hover_text, menu_options, on_quit=bye)
 
 
     def bir():
         get_birth.getbirth(1)
 
-
-    global lb1, lb
-    global root
     threading.Thread(target=tuop).start()
     root = tkinter.Tk()
     if GNlist['birthdayTX'] == 'Ture':
         threading.Thread(target=bir).start()
     root.geometry("+0+0")
-    root.attributes('-alpha', listt["alpha"])
+    root.attributes('-alpha', CSlist["alpha"])
     root.attributes('-topmost', 1)
     root.title('li')
     lb = tkinter.Label(root, text='',
-                       fg=listt['fontcolor'],
-                       font=(listt['font'], listt['timelarge']),
+                       fg=CSlist['fontcolor'],
+                       font=font,
                        )
     lb1 = tkinter.Label(root, text='',
-                        fg=listt['fontcolor'],
+                        fg=CSlist['fontcolor'],
                         font=font1)
     lb.pack()
     lb1.pack()
